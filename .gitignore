@@ -1,3 +1,12 @@
 package-lock.json
 package.json
 /node_modules
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.*
+!.env.example
