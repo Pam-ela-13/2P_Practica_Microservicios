@@ -9,7 +9,7 @@ router = APIRouter(
     prefix="/productos",
     tags=["productos"]
 )
-@router.get("/", response_model=list[ProductoResponse])
+@router.get("", response_model=list[ProductoResponse])
 def listar_productos(db: Session = Depends(obtener_db)):
     return producto_controller.obtener_producto(db)
 
@@ -22,7 +22,7 @@ def busca_producto(codigo: int, db: Session = Depends(obtener_db)):
     return producto
 
 #post registrar producto
-@router.post("/", response_model=ProductoResponse)
+@router.post("", response_model=ProductoResponse)
 def registrar_producto(producto: ProductoCreate, db: Session = Depends(obtener_db)):
     return producto_controller.crear_producto(db, producto)
 

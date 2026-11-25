@@ -6,6 +6,7 @@ app = FastAPI(
     title="servicio Productos",
     description="Servicio desarrollado en Clases de Arquitectura de software",
     version="1.0.0"
+    redirect_slashes=False
 )
 
 Base.metadata.create_all(bind=engine)
