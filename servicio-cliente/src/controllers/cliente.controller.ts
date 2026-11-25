@@ -13,8 +13,7 @@ export const obtenerClienteId = async (id: number) =>{
 //ORM SIQUALIZE PARA NO PONER SENTENCIAS SQL
 //FUNCION FLECHA 
 export const crearCliente = async (data: any) => {
-    if (data!)
-        throw Error('Datos incorrectos');
+    validarDatos(data);
     return await Cliente.create(data);
 }
 //
@@ -49,4 +48,4 @@ export const validarTelefono = (telefono: string) => {
     if (!/^\d{10}$/.test(telefono)) {
         throw Error('El teléfono debe tener 10 dígitos');
     }
-}; 
+};

@@ -2,7 +2,7 @@ import { Controller, Delete, Param, Patch, Post, Body, Get } from '@nestjs/commo
 import { FacturaService } from './factura.service.js';
 import { DetalleFactura } from '../../models/detalle-factura.model.js';
 
-@Controller('factura')
+@Controller('facturas')
 export class FacturaController {
     constructor(private readonly facturaService: FacturaService) { }
 

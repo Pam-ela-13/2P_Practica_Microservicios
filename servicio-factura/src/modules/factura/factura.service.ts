@@ -5,11 +5,13 @@ import { DetalleFactura } from '../../models/detalle-factura.model.js';
 
 
 import { ProductoClienteService } from '../../services/producto-cliente.service.js';
+import { ClienteService } from '../../services/cliente.service.js';
 
 @Injectable()
 export class FacturaService {
     constructor(
         private readonly productoCliente: ProductoClienteService,
+        private readonly clienteService: ClienteService,
     ) { }
 
     //esto es solo de factura
@@ -18,6 +20,7 @@ export class FacturaService {
         if (factura) {
             throw new ConflictException('Código ya existente');
         }
+        await this.clienteService.verificarCliente(data.cod_cliente);
         return db.orm.Factura.create({ ...data, fecha: new Date(data.fecha) });
     }
 
