@@ -1,0 +1,116 @@
+services: 
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_DB: cliente
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123456"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres-d cliente"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+      
+
+  mongodb:
+    image: mongodb:8
+    container_name: mongodb
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "mongosh", " --eval"," 'db.adminCommand(\"ping\")'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  servicio-cliente:
+    build: 
+      context: ./servicio-cliente
+      dockerfile: Dockerfile
+    container_name: servicio-cliente
+    environment:
+      DB_NAME: cliente
+      DB_USERNAME: postgres
+      DB_PASSWORD: 123456
+      DB_HOST: postgres
+      PORT: 3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  servicio-producto:
+    build: 
+      context: ./servicio-producto
+      dockerfile: Dockerfile
+    container_name: servicio-producto
+    environment:
+      DATABASE_URL: "sqlite:////app/data/producto.db"
+    volumes:
+      - ./servicio-producto/data:/app/data
+    networks:
+      - microservices-network
+    restart: unless-stopped
+  
+  servicio-factura:
+    build: 
+      context: ./servicio-factura
+      dockerfile: Dockerfile
+    container_name: servicio-factura
+    environment:
+      DATABASE_URL: "mongodb://mongodb:27017/factura"
+      PORT: 3003
+      PRODUCTOS_URL: "http://servicio-producto:3002/api/productos"
+      URL_CLIENTES: "http://servicio-cliente:3001/api/clientes"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  api-gateway:
+    build: 
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      SERVER_PORT: 3000
+      CLIENTE_SERVICE_URL: "http://servicio-cliente:3001"
+      PRODUCTO_SERVICE_URL: "http://servicio-producto:3002"
+      FACTURA_SERVICE_URL: "http://servicio-factura:3003"
+      
+    depends_on:
+      servicio-cliente:
+        condition: service_started
+      servicio-producto:
+        condition: service_started
+      servicio-factura:
+        condition: service_started
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongodb_data:
+    

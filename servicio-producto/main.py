@@ -5,7 +5,7 @@ from router.producto_route import router as producto_router
 app = FastAPI(
     title="servicio Productos",
     description="Servicio desarrollado en Clases de Arquitectura de software",
-    version="1.0.0"
+    version="1.0.0",
     redirect_slashes=False
 )
 

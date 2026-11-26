@@ -1,10 +1,15 @@
+import os
+from dotenv import load_dotenv
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 # sqlite bdd interna, archivito, para app moviles
 #declarative traduce 
 
-engine = create_engine("sqlite:///./producto.db")#al poner create engine se crea un pul de conexiones automatico.
+load_dotenv(dotenv_path = ".env")
+database_url = os.getenv("DATABASE_URL")
+engine = create_engine(database_url)#al poner create engine se crea un pul de conexiones automatico.
 
 SessionLocal = sessionmaker(
     autoflush = False,
